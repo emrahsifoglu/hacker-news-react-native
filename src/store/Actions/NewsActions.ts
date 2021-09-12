@@ -6,6 +6,11 @@ import {NewsActions} from './ActionTypes';
 export const onFetchNews = () => {
   return async (dispatch: Dispatch<NewsActions>) => {
     try {
+      dispatch({
+        type: NewsActionTypes.FETCH_NEWS,
+        payload: 'Fetcing issue with API',
+      });
+
       const response = await getUsersStories();
 
       if (!response) {

@@ -23,5 +23,6 @@ export interface UserStory {
 
 export interface NewsState {
   news: UserStory[];
+  isLoading: boolean;
   error: string | undefined;
 }
