@@ -17,6 +17,7 @@ import {
   Text,
   useColorScheme,
   View,
+  ActivityIndicator,
 } from 'react-native';
 
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
@@ -61,11 +62,31 @@ const AppNavigation = () => {
   };
 
   const dispatch = useDispatch();
-  const {news} = useSelector((state: ApplicationState) => state.newsReducer);
+  const {news, isLoading, error} = useSelector(
+    (state: ApplicationState) => state.newsReducer,
+  );
 
   useEffect(() => {
     dispatch(onFetchNews());
   }, [dispatch]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.view}>
+        <ActivityIndicator size="large" color="#5500dc" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.view}>
+        <Text style={styles.sectionError}>
+          Error fetching data... Check your network connection!
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -96,6 +117,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
   },
+  sectionError: {
+    fontSize: 18,
+  },
   sectionDescription: {
     marginTop: 8,
     fontSize: 18,
@@ -103,6 +127,11 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  view: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
