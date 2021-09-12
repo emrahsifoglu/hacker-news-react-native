@@ -20,12 +20,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
-
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Provider} from 'react-redux';
 import {store} from './src/store';
 import {useSelector, useDispatch} from 'react-redux';
 import {ApplicationState, onFetchNews} from './src/store';
+import {Button} from './src/components/Button';
 
 const Section: React.FC<{
   title: string;
@@ -66,6 +66,10 @@ const AppNavigation = () => {
     (state: ApplicationState) => state.newsReducer,
   );
 
+  const onRefreshNews = () => {
+    dispatch(onFetchNews());
+  };
+
   useEffect(() => {
     dispatch(onFetchNews());
   }, [dispatch]);
@@ -94,7 +98,7 @@ const AppNavigation = () => {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
+        <Button title="Refresh" onTap={onRefreshNews} />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
