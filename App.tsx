@@ -18,6 +18,7 @@ import {
   useColorScheme,
   View,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -26,31 +27,42 @@ import {store} from './src/store';
 import {useSelector, useDispatch} from 'react-redux';
 import {ApplicationState, onFetchNews} from './src/store';
 import {Button} from './src/components/Button';
+import {toLocaleDateString} from './src/helpers';
 
 const Section: React.FC<{
   title: string;
-}> = ({children, title}) => {
+  url: string;
+}> = ({children, title, url}) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+      <View>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color: isDarkMode ? Colors.white : Colors.black,
+            },
+          ]}>
+          {title}
+        </Text>
+        <Text
+          style={[
+            styles.sectionDescription,
+            {
+              color: isDarkMode ? Colors.light : Colors.dark,
+            },
+          ]}>
+          {children}
+        </Text>
+      </View>
+      <View style={styles.alignRight}>
+        {url && (
+          <Text style={styles.openURL} onPress={() => Linking.openURL(url)}>
+            Read more...
+          </Text>
+        )}
+      </View>
     </View>
   );
 };
@@ -76,7 +88,7 @@ const AppNavigation = () => {
 
   if (isLoading) {
     return (
-      <View style={styles.view}>
+      <View style={styles.sectionDefault}>
         <ActivityIndicator size="large" color="#5500dc" />
       </View>
     );
@@ -84,7 +96,7 @@ const AppNavigation = () => {
 
   if (error) {
     return (
-      <View style={styles.view}>
+      <View style={styles.sectionDefault}>
         <Text style={styles.sectionError}>
           Error fetching data... Check your network connection!
         </Text>
@@ -104,7 +116,24 @@ const AppNavigation = () => {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           {news.map(userStory => (
-            <Section key={userStory.story.id} title={userStory.story.title} />
+            <Section
+              key={userStory.story.id}
+              title={userStory.story.title}
+              url={userStory.story.url}>
+              <Text style={styles.highlight}>
+                By {userStory.author.id} on{' '}
+                {toLocaleDateString(userStory.story.time)}
+                {'\n'}
+              </Text>
+              <Text style={styles.sectionContent}>
+                {'\n'}
+                Score is {userStory.story.score}
+                {'\n'}
+              </Text>
+              <Text style={styles.sectionContent}>
+                Author's karma is {userStory.author.karma}
+              </Text>
+            </Section>
           ))}
         </View>
       </ScrollView>
@@ -114,7 +143,8 @@ const AppNavigation = () => {
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    marginTop: 32,
+    marginTop: 20,
+    marginBottom: 12,
     paddingHorizontal: 24,
   },
   sectionTitle: {
@@ -129,13 +159,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '400',
   },
+  sectionContent: {
+    fontSize: 16,
+    fontWeight: '400',
+  },
+  alignRight: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
   highlight: {
     fontWeight: '700',
   },
-  view: {
+  sectionDefault: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  openURL: {
+    fontWeight: '700',
+    fontStyle: 'italic',
+    fontSize: 16,
+    textDecorationLine: 'underline',
   },
 });
 
